@@ -22,19 +22,19 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh 'wsl mvn clean package'
+                sh 'mvn clean package'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'wsl mvn test'
+                sh 'mvn test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "wsl docker build -t ${IMAGE} ."
+                sh "docker build -t ${IMAGE} ."
             }
         }
 
@@ -46,8 +46,8 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                     sh """
-                        echo %PASS% | wsl docker login -u %USER% --password-stdin
-                        wsl docker push ${IMAGE}
+                        echo %PASS% | docker login -u %USER% --password-stdin
+                        docker push ${IMAGE}
                     """
                 }
             }
