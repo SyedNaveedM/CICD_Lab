@@ -22,19 +22,19 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                bat 'wsl mvn clean package'
+                sh 'wsl mvn clean package'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'wsl mvn test'
+                sh 'wsl mvn test'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat "wsl docker build -t ${IMAGE} ."
+                sh "wsl docker build -t ${IMAGE} ."
             }
         }
 
@@ -45,7 +45,7 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                    bat """
+                    sh """
                         echo %PASS% | wsl docker login -u %USER% --password-stdin
                         wsl docker push ${IMAGE}
                     """
@@ -55,11 +55,11 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                bat """
-                    wsl docker pull ${IMAGE}
-                    wsl docker stop todo-app || true
-                    wsl docker rm todo-app || true
-                    wsl docker run -d -it --name todo-app ${IMAGE}
+                sh """
+                    docker pull ${IMAGE}
+                    docker stop todo-app || true
+                    docker rm todo-app || true
+                    docker run -d -it --name todo-app ${IMAGE}
                 """
             }
         }
